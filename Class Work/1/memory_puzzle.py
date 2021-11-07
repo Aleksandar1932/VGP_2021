@@ -6,14 +6,14 @@ import pygame
 import random, pygame, sys
 from pygame.locals import *
 
-FPS = 30 # frames per second, the general speed of the program
+FPS = 5 # frames per second, the general speed of the program  #4
 WINDOWWIDTH = 640 # size of window's width in pixels
 WINDOWHEIGHT = 480 # size of windows' height in pixels
 REVEALSPEED = 8 # speed boxes' sliding reveals and covers
 BOXSIZE = 40 # size of box height & width in pixels
 GAPSIZE = 10 # size of gap between boxes in pixels
-BOARDWIDTH = 10 # number of columns of icons
-BOARDHEIGHT = 7 # number of rows of icons
+BOARDWIDTH = 10 + 20 # size of gap between boxes in pixels  #2
+BOARDHEIGHT = 7 + 20 # number of columns of icons  #2
 assert (BOARDWIDTH * BOARDHEIGHT) % 2 == 0, 'Board needs to have an even number of boxes for pairs of matches.'
 XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
@@ -30,7 +30,7 @@ ORANGE   = (255, 128,   0)
 PURPLE   = (255,   0, 255)
 CYAN     = (  0, 255, 255)
 
-BGCOLOR = NAVYBLUE
+BGCOLOR = CYAN
 LIGHTBGCOLOR = GRAY
 BOXCOLOR = WHITE
 HIGHLIGHTCOLOR = BLUE
@@ -43,6 +43,7 @@ OVAL = 'oval'
 
 ALLCOLORS = (RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, CYAN)
 ALLSHAPES = (DONUT, SQUARE, DIAMOND, LINES, OVAL)
+ALLSHAPES = tuple([f"shape_{i}" for i in range(0,60)])  #3
 assert len(ALLCOLORS) * len(ALLSHAPES) * 2 >= BOARDWIDTH * BOARDHEIGHT, "Board is too big for the number of shapes/colors defined."
 
 def main():
@@ -52,8 +53,8 @@ def main():
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 
     mousex = 0 # used to store x coordinate of mouse event
-    mousey = 0 # used to store y coordinate of mouse event
-    pygame.display.set_caption('Memory Game')
+    mousey = 0 # used to store y coordinate of mouse event 
+    pygame.display.set_caption('Memory Game Modified by 186063')  #8
 
     mainBoard = getRandomizedBoard()
     revealedBoxes = generateRevealedBoxesData(False)
@@ -152,13 +153,10 @@ def getRandomizedBoard():
     return board
 
 
-def splitIntoGroupsOf(groupSize, theList):
+def splitIntoGroupsOf(groupSize, theList):  #5
     # splits a list into a list of lists, where the inner lists have at
     # most groupSize number of items.
-    result = []
-    for i in range(0, len(theList), groupSize):
-        result.append(theList[i:i + groupSize])
-    return result
+    return [theList]
 
 
 def leftTopCoordsOfBox(boxx, boxy):
@@ -219,13 +217,13 @@ def drawBoxCovers(board, boxes, coverage):
     FPSCLOCK.tick(FPS)
 
 
-def revealBoxesAnimation(board, boxesToReveal):
+def coverBoxesAnimation(board, boxesToReveal):  #7
     # Do the "box reveal" animation.
     for coverage in range(BOXSIZE, (-REVEALSPEED) - 1, -REVEALSPEED):
         drawBoxCovers(board, boxesToReveal, coverage)
 
 
-def coverBoxesAnimation(board, boxesToCover):
+def revealBoxesAnimation(board, boxesToCover):  #7
     # Do the "box cover" animation.
     for coverage in range(0, BOXSIZE + REVEALSPEED, REVEALSPEED):
         drawBoxCovers(board, boxesToCover, coverage)
