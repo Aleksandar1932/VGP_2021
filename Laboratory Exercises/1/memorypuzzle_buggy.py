@@ -3,6 +3,7 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
+from operator import mul
 import random, pygame, sys
 from pygame.locals import *
 
@@ -17,6 +18,7 @@ BOARDHEIGHT = 7 # number of rows of icons
 assert (BOARDWIDTH * BOARDHEIGHT) % 2 == 0, 'Board needs to have an even number of boxes for pairs of matches.'
 XMARGIN = int((WINDOWWIDTH - (BOARDWIDTH * (BOXSIZE + GAPSIZE))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (BOARDHEIGHT * (BOXSIZE + GAPSIZE))) / 2)
+fpsClock = pygame.time.Clock()
 
 #            R    G    B
 GRAY     = (100, 100, 100)
@@ -53,7 +55,7 @@ def main():
 
     mousex = 0 # used to store x coordinate of mouse event
     mousey = 0 # used to store y coordinate of mouse event
-    pygame.display.set_caption('Memory Game')
+    pygame.display.set_caption("Aleksandar's Memory Game")
 
     mainBoard = getRandomizedBoard()
     revealedBoxes = generateRevealedBoxesData(False)
@@ -63,13 +65,14 @@ def main():
     DISPLAYSURF.fill(BGCOLOR)
     startGameAnimation(mainBoard)
 
-    while True: # main game loop
+    for i in range(10000): # main game loop
         mouseClicked = False
 
         DISPLAYSURF.fill(BGCOLOR) # drawing the window
         drawBoard(mainBoard, revealedBoxes)
 
         for event in pygame.event.get(): # event handling loop
+            gameWonAnimation(mainBoard)
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
@@ -215,8 +218,8 @@ def drawBoxCovers(board, boxes, coverage):
         drawIcon(shape, color, box[0], box[1])
         if coverage > 0: # only draw the cover if there is an coverage
             pygame.draw.rect(DISPLAYSURF, BOXCOLOR, (left, top, coverage, BOXSIZE))
-        pygame.display.update()
-        FPSCLOCK.tick(FPS)
+    pygame.display.update()  # FIX: indent
+    FPSCLOCK.tick(FPS)
 
 
 def revealBoxesAnimation(board, boxesToReveal):
@@ -269,8 +272,40 @@ def startGameAnimation(board):
 def gameWonAnimation(board):
     # flash the background color when the player has won
     coveredBoxes = generateRevealedBoxesData(True)
-    color1 = LIGHTBGCOLOR
-    color2 = BGCOLOR
+    wonImage = pygame.image.load('wonImage.png')
+    x = 10
+    y = 10
+
+    direction = 'right'
+    while True: # the main game loop
+        DISPLAYSURF.fill(WHITE)
+        multiplier = random.randint(1,10)
+        if direction == 'right':
+            x += 5 * multiplier
+            if x > 280:
+                direction = 'down'
+        elif direction == 'down':
+            y += 5 * multiplier
+            if y > 220:
+                direction = 'left'
+        elif direction == 'left':
+            x -= 5 * multiplier
+            if x < 10:
+                direction = 'up'
+        elif direction == 'up':
+            y -= 5 * multiplier
+            if y < 10:
+                direction = 'right'
+
+        DISPLAYSURF.blit(wonImage, (x, y))
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.update()
+        fpsClock.tick(FPS)
 
     for i in range(13):
         color1, color2 = color2, color1 # swap colors
